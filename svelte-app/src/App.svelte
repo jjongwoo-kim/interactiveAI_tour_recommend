@@ -31,7 +31,7 @@
     </div>
     <div id="chatForm">
         <input type="text" autocomplete="off" size="30" id="messageInput" placeholder="enter message" />
-        <button type="button" value="enter" on:click={inputChat}>Enter</button>
+        <button type="button" class="sendButton" value="enter" on:click={inputChat}>Send</button>
     </div>
 </div>
 
@@ -58,6 +58,7 @@
 
 #myMsg {
     text-align: right;
+    max-width: 100%;
 }
 
 #aiMsg {
@@ -71,7 +72,8 @@
     padding: 7px 15px;
     margin-bottom: 10px;
     margin-top: 5px;
-
+    max-width: 220px;
+    word-wrap: break-word;
 }
 
 #aiMsg .msg {
@@ -79,8 +81,8 @@
 
 }
 
-#myMsg > .msg {
-    background-color: #0084FF;
+#myMsg .msg {
+    background-color: #000000;
     color: #fff;
 }
 
@@ -97,7 +99,7 @@
 }
 
 #messageInput {
-    width: 85%;
+    width: 88%;
     height: calc(100% - 1px);
     border: none;
     padding-bottom: 0;
@@ -107,11 +109,16 @@
     outline: none;
 }
 
-/* #chatForm > input[type=submit] {
-    outline: none;
-    border: none;
-    background: none;
-    color: #0084FF;
-    font-size: 17px;
-} */
+.sendButton {
+    background-color: rgba(70, 98, 211, 0.679);
+    color: white;
+    width: 60px;
+    height: 35px;
+    align-items: center;
+	font-family: "Roboto", sans-serif;
+	font-weight: bold;
+    vertical-align: middle;
+}
+
+
 </style>
