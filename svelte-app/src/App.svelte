@@ -1,5 +1,6 @@
 <script>
     let messages = [];
+    
     const inputChat = () => {
         const messageInput = document.getElementById("messageInput");
         const message = messageInput.value.trim();
@@ -7,6 +8,12 @@
         if(message != "") {
             messages = [...messages, {text: message}]
             messageInput.value="";
+        }
+    }
+
+    const enterkeyMessage = (e) => {
+        if(e.keyCode === 13) {
+            inputChat();
         }
     }
 </script>
@@ -17,6 +24,7 @@
         <div id="chatMessage">
             <div id="aiMsg">
                 <span class="tripWiz">TripWiz</span>
+                <!-- tripwiz 동적 입력-->
                 <span class="msg">Hello</span>
             </div>
             <div id="myMsg">
@@ -30,7 +38,7 @@
         {/each}
     </div>
     <div id="chatForm">
-        <input type="text" autocomplete="off" size="30" id="messageInput" placeholder="enter message" />
+        <input type="text" autocomplete="off" on:keydown={enterkeyMessage} id="messageInput" placeholder="enter message" />
         <button type="button" class="sendButton" value="enter" on:click={inputChat}>Send</button>
     </div>
 </div>
@@ -118,6 +126,7 @@
 	font-family: "Roboto", sans-serif;
 	font-weight: bold;
     vertical-align: middle;
+    border-radius: 10px;
 }
 
 
