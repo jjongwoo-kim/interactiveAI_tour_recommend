@@ -1,172 +1,86 @@
+<!-- App.svelte -->
+
 <script>
-    let messages = [];
-    let aiMessages = [];
+    import { onMount } from 'svelte';
+    import Calendar from 'svelte-calendar';
+  
+    let selectedDate;
+    let weatherInfo = null;
+  
+    async function fetchWeather() {
+      if (!selectedDate) return;
+  
+      // 선택된 날짜를 기반으로 API 호출 및 처리를 구현함
+      // API로부터 받은 날씨 정보를 weatherInfo 변수에 저장함
 
-    const apiKey = 'api-key';
-    const apiEndpoint = 'https://api.openai.com/v1/chat/completions';
-
-    const inputChat = () => {
-        const messageInput = document.getElementById("messageInput");
-        const message = messageInput.value.trim();
-        if(message != "") {
-            messages = [...messages, {text: message}]
-            messageInput.value="";
-            addMessage(message);
+    try {
+        const dateString = selectedDate.toISOString().split('T')[0]; // 선택된 날짜를 ISO 형식의 문자열로 변환 :(YYYY-MM-DDTHH:mm:ss.sssZ)형식
+        const response = await fetch(`https://api.weatherapi.com/v1/history.json?key=YOUR_API_KEY&q=YOUR_LOCATION&dt=${dateString}`);
+        // YOUR_API_KEY와 YOUR_LOCATION 여기에 날씨 API 키와 위치로 대체해야함 
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch weather data');
         }
+        
+        const data = await response.json();
+        
+        // API에서 받은 데이터에서 필요한 날씨 정보를 추출
+        const temperature = data.temperature;
+        const condition = data.condition;
+        
+        // 추출된 날씨 정보를 weatherInfo 변수에 저장
+        weatherInfo = { temperature, condition };
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+    }
+}
+
+    $: fetchWeather(); //fetchWeather 함수 호출
+  </script>
+  
+  <style>
+    /* 스타일을 추가하여 웹사이트의 디자인 수정하기 */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5; /* 화이트 */
+      color: #333; /* 블랙 */
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  
+    /* 추가로 다른 요소 추가해서 홈페이지 꾸며야함 */
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
 
-    const enterkeyMessage = (e) => {
-        if(e.keyCode === 13) {
-            inputChat();
-        }
-    }
-
-    const addMessage = async (message) => {
-        try {
-            const aiResponse = await fetchAIResponse(message);
-            aiMessages = [...aiMessages, {text: aiResponse}];
-        } catch (error) {
-            console.log('API 요청 중 에러가 발생하였습니다.', error);
-            aiMessages = [...aiMessages, {text: 'API 요청 중 에러가 발생하였습니다.'}];
-        }
-    }
-
-    // ChatGPT API 요청
-    async function fetchAIResponse(prompt) {
-        // API 요청에 사용할 옵션들 정의
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo",  // 사용할 AI 모델
-                messages: [{
-                    role: "user", // 메시지 역할을 user로 설정
-                    content: prompt // 사용자가 입력한 메시지
-                }, ],
-                temperature: 0.8, // 모델의 출력 다양성
-                max_tokens: 1024, // 응답받을 메시지 최대 토큰(단어) 수 설정
-                top_p: 1, // 토큰 샘플링 확률을 설정
-                frequency_penalty: 0.5, // 일반적으로 나오지 않는 단어를 억제하는 정도
-                presence_penalty: 0.5, // 동일한 단어나 구문이 반복되는 것을 억제하는 정도
-                stop: ["Human"], // 생성된 텍스트에서 종료 구문을 설정
-        }),
-        };
-        try { // API 요청 후 응답 처리
-            const response = await fetch(apiEndpoint, requestOptions);
-            const data = await response.json();
-            console.log(data);
-            const aiResponse = data.choices[0].message.content;
-            return aiResponse;
-        } catch (error) {
-		    console.error('OpenAI API 호출 중 오류 발생:', error);
-            return error;
-        }
-    }
-</script>
-
-<div id="chatWrap">
-    <div id="chatHeader">TripWiz</div>
-    <div id="chatLog">
-        {#each messages as message}
-            <div id="myMsg">
-                <div class="msg">{message.text}</div>
-            </div>
-        {/each}
-        {#each aiMessages as aiResponse}
-            <div id="aiMsg">
-                <div class="msg">{aiResponse.text}</div>
-            </div>
-        {/each}
-    </div>
-    <div id="chatForm">
-        <input type="text" autocomplete="off" on:keydown={enterkeyMessage} id="messageInput" placeholder="enter message" />
-        <button type="button" class="sendButton" value="enter" on:click={inputChat}>Send</button>
-    </div>
-</div>
-
-<style>
-#chatWrap {
-    width: 600px;
-    border: 1px solid #ddd;
-}
-
-#chatHeader {
-    height: 60px;
-    text-align: center;
-    line-height: 60px;
-    font-size: 25px;
-    font-weight: 900;
-    border-bottom: 1px solid #ddd;
-}
-
-#chatLog {
-    height: 700px;
-    overflow-y: auto;
-    padding: 10px;
-}
-
-#myMsg {
-    text-align: right;
-    max-width: 100%;
-}
-
-#aiMsg {
-    text-align: left;
-    margin-bottom: 5px;
-}
-
-.msg {
-    display: inline-block;
-    border-radius: 15px;
-    padding: 7px 15px;
+    .calendar-header {
     margin-bottom: 10px;
-    margin-top: 5px;
-    max-width: 220px;
-    word-wrap: break-word;
-}
-
-#aiMsg .msg {
-    background-color: #f1f0f0;
-
-}
-
-#myMsg .msg {
-    background-color: #000000;
-    color: #fff;
-}
-
-#chatForm {
-    display: block;
-    width: 100%;
-    height: 50px;
-    border-top: 2px solid #f0f0f0;
-}
-
-#messageInput {
-    width: 88%;
-    height: calc(100% - 1px);
-    border: none;
-    padding-bottom: 0;
-}
-
-#messageInput:focus {
-    outline: none;
-}
-
-.sendButton {
-    background-color: rgba(70, 98, 211, 0.679);
-    color: white;
-    width: 60px;
-    height: 35px;
-    align-items: center;
-	font-family: "Roboto", sans-serif;
-	font-weight: bold;
-    vertical-align: middle;
-    border-radius: 10px;
-}
-
-
-</style>
+    font-size: 20px;
+  }
+  </style>
+  
+  <!-- 웹사이트의 구성 요소 -->
+  <div class="container">
+    <h1>날씨 정보</h1>
+      <!-- "원하는 날짜를 선택해주세요!" 문구 -->
+  <div class="calendar-header">원하는 날짜를 선택해주세요!</div>
+    <!-- Calendar 컴포넌트를 사용하여 날짜를 선택 -->
+    <Calendar bind:selectedDate />
+  
+    <!-- 선택된 날짜에 대한 날씨 정보 표시 -->
+    {#if weatherInfo}
+      <p>날짜: {selectedDate.toLocaleDateString()}</p>
+      <p>온도: {weatherInfo.temperature}</p>
+      <p>날씨 상태: {weatherInfo.condition}</p>
+    {:else}
+      <p>날씨 정보를 불러오는 중입니다...</p>
+    {/if}
+  </div>
+  
