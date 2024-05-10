@@ -1,11 +1,11 @@
 <script>
-    let messages = [];
-    let aiMessages = [];
+    let messages = []; // 내 메세지를 담은 배열
+    let aiMessages = []; // ai 메세지를 담은 배열
 
-    const apiKey = 'api-key';
+    const apiKey = 'api-key'; // chat GPT api key
     const apiEndpoint = 'https://api.openai.com/v1/chat/completions';
 
-    const inputChat = () => {
+    const inputChat = () => { // 내 메시지를 입력하는 함수
         const messageInput = document.getElementById("messageInput");
         const message = messageInput.value.trim();
         if(message != "") {
@@ -15,13 +15,13 @@
         }
     }
 
-    const enterkeyMessage = (e) => {
+    const enterkeyMessage = (e) => { // 엔터키 작동하게 하는 함수
         if(e.keyCode === 13) {
             inputChat();
         }
     }
 
-    const addMessage = async (message) => {
+    const addMessage = async (message) => { // ai 메세지를 추가하는 함수
         try {
             const aiResponse = await fetchAIResponse(message);
             aiMessages = [...aiMessages, {text: aiResponse}];
