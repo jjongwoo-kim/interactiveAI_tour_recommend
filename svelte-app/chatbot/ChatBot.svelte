@@ -70,18 +70,18 @@
 <div id="chatWrap">
     <div id="chatHeader">TripWiz</div>
     <div id="chatLog">
-        {#each messages as message}
+        {#each messages as message}    <!-- 내 메시지 부분 -->
             <div id="myMsg">
                 <div class="msg">{message.text}</div>
             </div>
         {/each}
-        {#each aiMessages as aiResponse}
+        {#each aiMessages as aiResponse}    <!-- ai 메시지 부분 -->
             <div id="aiMsg">
                 <div class="msg">{aiResponse.text}</div>
             </div>
         {/each}
     </div>
-    <div id="chatForm">
+    <div id="chatForm">     <!-- 메시지입력, 전송버튼 -->
         <input type="text" autocomplete="off" on:keydown={enterkeyMessage} id="messageInput" placeholder="enter message" />
         <button type="button" class="sendButton" value="enter" on:click={inputChat}>Send</button>
     </div>
