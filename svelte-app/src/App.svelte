@@ -1,86 +1,70 @@
-<!-- App.svelte -->
-
 <script>
-    import { onMount } from 'svelte';
-    import Calendar from 'svelte-calendar';
-  
-    let selectedDate;
-    let weatherInfo = null;
-  
-    async function fetchWeather() {
-      if (!selectedDate) return;
-  
-      // 선택된 날짜를 기반으로 API 호출 및 처리를 구현함
-      // API로부터 받은 날씨 정보를 weatherInfo 변수에 저장함
+    let weathers = []; // 받은 데이터를 저장할 변수
+	let tripLocation;
 
-    try {
-        const dateString = selectedDate.toISOString().split('T')[0]; // 선택된 날짜를 ISO 형식의 문자열로 변환 :(YYYY-MM-DDTHH:mm:ss.sssZ)형식
-        const response = await fetch(`https://api.weatherapi.com/v1/history.json?key=YOUR_API_KEY&q=YOUR_LOCATION&dt=${dateString}`);
-        // YOUR_API_KEY와 YOUR_LOCATION 여기에 날씨 API 키와 위치로 대체해야함 
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch weather data');
+	const inputValue = () => { // 지역을 적은 값 전달 함수
+		tripLocation = document.getElementById('locationInput').value.trim();
+        console.log(tripLocation); // type String
+		sendDataToServer(tripLocation);
+	}
+
+    // API에서 데이터를 가져오는 비동기 함수
+    async function fetchData() {
+        try {
+            const response = await fetch("http://localhost:8081/save"); // 백엔드 엔드포인트에 GET 요청
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            weathers = await response.json(); // JSON 형식으로 응답된 데이터를 변수에 저장
+            console.log(weathers); // 받은 데이터를 콘솔에 출력하여 확인
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
-        
-        const data = await response.json();
-        
-        // API에서 받은 데이터에서 필요한 날씨 정보를 추출
-        const temperature = data.temperature;
-        const condition = data.condition;
-        
-        // 추출된 날씨 정보를 weatherInfo 변수에 저장
-        weatherInfo = { temperature, condition };
-    } catch (error) {
-        console.error('Error fetching weather data:', error);
-    }
-}
-
-    $: fetchWeather(); //fetchWeather 함수 호출
-  </script>
-  
-  <style>
-    /* 스타일을 추가하여 웹사이트의 디자인 수정하기 */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5; /* 화이트 */
-      color: #333; /* 블랙 */
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-  
-    /* 추가로 다른 요소 추가해서 홈페이지 꾸며야함 */
-    .container {
-      width: 80%;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
     }
 
-    .calendar-header {
-    margin-bottom: 10px;
-    font-size: 20px;
-  }
-  </style>
-  
-  <!-- 웹사이트의 구성 요소 -->
-  <div class="container">
-    <h1>날씨 정보</h1>
-      <!-- "원하는 날짜를 선택해주세요!" 문구 -->
-  <div class="calendar-header">원하는 날짜를 선택해주세요!</div>
-    <!-- Calendar 컴포넌트를 사용하여 날짜를 선택 -->
-    <Calendar bind:selectedDate />
-  
-    <!-- 선택된 날짜에 대한 날씨 정보 표시 -->
-    {#if weatherInfo}
-      <p>날짜: {selectedDate.toLocaleDateString()}</p>
-      <p>온도: {weatherInfo.temperature}</p>
-      <p>날씨 상태: {weatherInfo.condition}</p>
-    {:else}
-      <p>날씨 정보를 불러오는 중입니다...</p>
-    {/if}
-  </div>
-  
+    async function sendDataToServer(data) { // 지역값 서버로 보내는 함수
+
+        console.log(data);
+        try {
+            const response = await fetch("http://localhost:8081/save", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to send data to server');
+            }
+            console.log('Data sent to server successfully');
+        } catch (error) {
+            console.error('Error sending data to server:', error);
+        }
+        fetchData();
+    }
+
+</script>
+	<div>
+		<input type="text" id="locationInput" placeholder="지역 이름을 입력하세요">
+		<button on:click={inputValue}>전송</button>
+	<!-- 임시로 만든 받은 데이터를 화면에 표시하는 부분 -->
+		{#if weathers.length > 0}
+			<ul>
+				{#each weathers as weather}
+					<li>
+						<p>{tripLocation} 날씨 입니다.</p>
+						<p>Date: {weather.date}</p>
+						<p>Low Temperature: {weather.low_temperature}</p>
+						<p>High Temperature: {weather.high_temperature}</p>
+						<p>Weather: {weather.weather}</p>
+					</li>
+				{/each}
+			</ul>
+		{:else}
+			<p>No weather data available</p>
+		{/if}
+	</div>
+
+<style>
+
+</style>
