@@ -1,6 +1,5 @@
 <script>
     let messages = []; // 내 메세지를 담은 배열
-    let aiMessages = []; // ai 메세지를 담은 배열
 
     const apiKey = 'api-key'; // chat GPT api key
     const apiEndpoint = 'https://api.openai.com/v1/chat/completions';
@@ -9,7 +8,7 @@
         const messageInput = document.getElementById("messageInput");
         const message = messageInput.value.trim();
         if(message != "") {
-            messages = [...messages, {text: message}]
+            messages = [...messages, { text: message, isUser: true }];
             messageInput.value="";
             addMessage(message);
         }
@@ -24,10 +23,10 @@
     const addMessage = async (message) => { // ai 메세지를 추가하는 함수
         try {
             const aiResponse = await fetchAIResponse(message);
-            aiMessages = [...aiMessages, {text: aiResponse}];
+            messages = [...messages, { text: aiResponse, isUser: false }];
         } catch (error) {
             console.log('API 요청 중 에러가 발생하였습니다.', error);
-            aiMessages = [...aiMessages, {text: 'API 요청 중 에러가 발생하였습니다.'}];
+            messages = [...messages, {text: 'API 요청 중 에러가 발생하였습니다.'}];
         }
     }
 
@@ -71,14 +70,15 @@
     <div id="chatHeader">TripWiz</div>
     <div id="chatLog">
         {#each messages as message}    <!-- 내 메시지 부분 -->
-            <div id="myMsg">
-                <div class="msg">{message.text}</div>
-            </div>
-        {/each}
-        {#each aiMessages as aiResponse}    <!-- ai 메시지 부분 -->
-            <div id="aiMsg">
-                <div class="msg">{aiResponse.text}</div>
-            </div>
+            {#if message.isUser}
+                <div id="myMsg">
+                    <div class="msg">{message.text}</div>
+                </div>
+            {:else}
+                <div id="aiMsg">
+                    <div class="msg">{message.text}</div>
+                </div>
+            {/if}
         {/each}
     </div>
     <div id="chatForm">     <!-- 메시지입력, 전송버튼 -->
