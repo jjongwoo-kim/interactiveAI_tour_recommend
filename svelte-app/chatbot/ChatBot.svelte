@@ -1,8 +1,7 @@
 <script>
     let messages = []; // 내 메세지를 담은 배열
 
-    const apiKey = 'api-key'; // chat GPT api key
-    const apiEndpoint = 'https://api.openai.com/v1/chat/completions';
+    // const backEndpoint = "http://localhost:8081/message";
 
     const inputChat = () => { // 내 메시지를 입력하는 함수
         const messageInput = document.getElementById("messageInput");
@@ -26,42 +25,30 @@
             messages = [...messages, { text: aiResponse, isUser: false }];
         } catch (error) {
             console.log('API 요청 중 에러가 발생하였습니다.', error);
-            messages = [...messages, {text: 'API 요청 중 에러가 발생하였습니다.'}];
+            messages = [...messages, {text: 'API 요청 중 에러가 발생하였습니다. 클라이언트'}];
         }
     }
 
     // ChatGPT API 요청
     async function fetchAIResponse(prompt) {
-        // API 요청에 사용할 옵션들 정의
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo",  // 사용할 AI 모델
-                messages: [{
-                    role: "user", // 메시지 역할을 user로 설정
-                    content: prompt // 사용자가 입력한 메시지
-                }, ],
-                temperature: 0.8, // 모델의 출력 다양성
-                max_tokens: 1024, // 응답받을 메시지 최대 토큰(단어) 수 설정
-                top_p: 1, // 토큰 샘플링 확률을 설정
-                frequency_penalty: 0.5, // 일반적으로 나오지 않는 단어를 억제하는 정도
-                presence_penalty: 0.5, // 동일한 단어나 구문이 반복되는 것을 억제하는 정도
-                stop: ["Human"], // 생성된 텍스트에서 종료 구문을 설정
-        }),
-        };
-        try { // API 요청 후 응답 처리
-            const response = await fetch(apiEndpoint, requestOptions);
-            const data = await response.json();
-            console.log(data);
-            const aiResponse = data.choices[0].message.content;
-            return aiResponse;
+        try {
+            const response = await fetch("http://localhost:8081/api/message", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: prompt })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+	        const data = await response.json();
+			console.log(data);
+            return data.response;
         } catch (error) {
-		    console.error('OpenAI API 호출 중 오류 발생:', error);
-            return error;
+            console.error('Error fetching AI response:', error);
+            return 'Error fetching AI response';
         }
     }
 </script>
