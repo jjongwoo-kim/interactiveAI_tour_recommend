@@ -1,4 +1,4 @@
-package tripwiz.domain;
+package tripwiz.dto;
 
 import lombok.Builder;
 import lombok.Getter;

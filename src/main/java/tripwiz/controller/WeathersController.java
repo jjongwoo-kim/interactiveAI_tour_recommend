@@ -3,7 +3,7 @@ package tripwiz.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tripwiz.domain.Weathers;
+import tripwiz.dto.Weathers;
 import tripwiz.service.WeathersService;
 
 import java.util.List;
