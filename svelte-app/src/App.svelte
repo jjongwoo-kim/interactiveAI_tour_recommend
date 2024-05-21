@@ -1,12 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripWiz</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 6em; /* 상단 여백 추가 */
+    }
+
+    h1 {
+        font-size: 18px;
+    }
+
+    #site-name {
+        font-family: 'Pacifico', cursive; /* Pacifico 글꼴 적용 */
+        font-size: 72px; /* TripWiz 사이즈 변경 */
+        font-weight: bold;
+        margin-top: 40px; /* 간격 더 넓게 설정 */
+        margin-bottom: 20px;
+    }
+
+    #chatbot-description {
+        font-size: 14px; /* 기본 사이즈로 변경 */
+        margin-bottom: 20px; /* 간격 조절 */
+    }
+
+    #input-area {
+        margin-top: 20px;
+    }
+
+    input[type="text"] {
+        padding: 8px 16px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    #submit-input {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #000; /* 색깔 검정색으로 변경 */
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        margin-top: 20px; /* 챗봇 시작하기 버튼 아래로 위치시키기 */
+    }
+
+    #submit-input:hover {
+        background-color: #333; /* hover 색깔 변경 */
+    }
+
+    #weather-info ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    #weather-info li {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        margin: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: left;
+    }
+</style>
+</head>
+<body>
+
+<h1 id="site-name">TripWiz</h1> <!-- TripWiz 사이즈 변경 -->
+
+<p id="chatbot-description">관광지 추천 Chatbot을 사용하여 지역의 날씨 정보를 검색해보세요!</p> <!-- 설명 추가 -->
+
+<div id="input-area">
+    <p>안녕하세요.</p>
+    <p>원하시는 지역을 입력해주세요.</p>
+    <input type="text" id="locationInput" placeholder="지역 이름을 입력하세요">
+    <button id="submit-input">입력 완료</button> <!-- 입력 완료 버튼 추가 -->
+</div>
+
+<br><br>
+
+<!-- 날씨 정보를 표시할 공간 추가 -->
+<div id="weather-info"></div>
+
 <script>
     let weathers = []; // 받은 데이터를 저장할 변수
-	let tripLocation;
+    let tripLocation;
 
-	const inputValue = () => { // 지역을 적은 값 전달 함수
-		tripLocation = document.getElementById('locationInput').value.trim();
-        console.log(tripLocation); // type String
-		sendDataToServer(tripLocation);
-	}
+    document.getElementById('submit-input').addEventListener('click', inputValue);
+
+    const inputValue = () => { // 지역을 적은 값 전달 함수
+        tripLocation = document.getElementById('locationInput').value.trim();
+        console.log("Input Value: ", tripLocation); // type String
+        if (tripLocation) {
+            sendDataToServer({ location: tripLocation });
+        } else {
+            console.error("No location input provided");
+        }
+    }
 
     // API에서 데이터를 가져오는 비동기 함수
     async function fetchData() {
@@ -14,57 +113,4 @@
             const response = await fetch("http://localhost:8081/save"); // 백엔드 엔드포인트에 GET 요청
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
-            }
-            weathers = await response.json(); // JSON 형식으로 응답된 데이터를 변수에 저장
-            console.log(weathers); // 받은 데이터를 콘솔에 출력하여 확인
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
 
-    async function sendDataToServer(data) { // 지역값 서버로 보내는 함수
-
-        console.log(data);
-        try {
-            const response = await fetch("http://localhost:8081/save", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
-            if (!response.ok) {
-                throw new Error('Failed to send data to server');
-            }
-            console.log('Data sent to server successfully');
-        } catch (error) {
-            console.error('Error sending data to server:', error);
-        }
-        fetchData();
-    }
-
-</script>
-	<div>
-		<input type="text" id="locationInput" placeholder="지역 이름을 입력하세요">
-		<button on:click={inputValue}>전송</button>
-	<!-- 임시로 만든 받은 데이터를 화면에 표시하는 부분 -->
-		{#if weathers.length > 0}
-			<ul>
-				{#each weathers as weather}
-					<li>
-						<p>{tripLocation} 날씨 입니다.</p>
-						<p>Date: {weather.date}</p>
-						<p>Low Temperature: {weather.low_temperature}</p>
-						<p>High Temperature: {weather.high_temperature}</p>
-						<p>Weather: {weather.weather}</p>
-					</li>
-				{/each}
-			</ul>
-		{:else}
-			<p>No weather data available</p>
-		{/if}
-	</div>
-
-<style>
-
-</style>
