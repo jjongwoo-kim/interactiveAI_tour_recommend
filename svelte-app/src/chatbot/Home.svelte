@@ -26,7 +26,7 @@
 
         console.log(data);
         try {
-            const response = await fetch("http://localhost:8081/", {
+            const response = await fetch("http://localhost:8081/save", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
