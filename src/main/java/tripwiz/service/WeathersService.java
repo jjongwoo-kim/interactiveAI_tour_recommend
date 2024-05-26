@@ -26,17 +26,25 @@ public class WeathersService { // 날씨 정보를 크롤링 해오는 서비스
 	public List<Weathers> getWeathersData() throws IOException {
 		List<Weathers> weathersList = new ArrayList<>();
 		Document document = Jsoup.connect(Weathers_URL).get(); // 크롤링
-		Elements contents = document.select(".week_list"); // 주간 예보파트 크롤링
+		Elements weekList = document.select(".week_list"); // 주간 예보파트 크롤링
 
-		for(Element content : contents) {
-			Weathers weathers = Weathers.builder()
-					.date(content.select(".date").text()) // 날씨 정보
-					.weather(content.select(".wt_icon .blind").text()) // 날씨 정보
-					.low_temperature(content.select(".lowest").text()) // 최저 온도
-					.high_temperature(content.select(".highest").text()) // 최고 온도
-					.build();
-			weathersList.add(weathers);
-			//System.out.println(weathersList);
+		for (Element week : weekList) {
+			Elements dates = week.select(".date");
+			Elements weatherDescriptions = week.select(".wt_icon .blind");
+			Elements lowTemperatures = week.select(".lowest");
+			Elements highTemperatures = week.select(".highest");
+
+			int daysCount = dates.size();
+
+			for (int i = 0; i < daysCount; i++) {
+				Weathers weather = Weathers.builder()
+						.date(dates.get(i).text()) // 날짜 정보
+						.weather(weatherDescriptions.get(i).text()) // 날씨 정보
+						.low_temperature(lowTemperatures.get(i).text()) // 최저 온도
+						.high_temperature(highTemperatures.get(i).text()) // 최고 온도
+						.build();
+				weathersList.add(weather);
+			}
 		}
 		return weathersList;
 	}
