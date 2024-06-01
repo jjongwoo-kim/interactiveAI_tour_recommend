@@ -11,15 +11,17 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
-    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-terser": "^0.4.4",
     "rollup": "^3.15.0",
-    "rollup-plugin-css-only": "^4.3.0",
+    "rollup-plugin-css-only": "^4.5.2",
     "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-svelte": "^7.1.2",
+    "rollup-plugin-svelte": "^7.2.0",
     "svelte": "^3.55.0",
     "svelte-routing": "^2.13.0"
   },
   "dependencies": {
+    "daterangepicker": "^3.1.0",
+    "jquery": "^3.7.1",
     "sirv-cli": "^2.0.0",
     "svelte-calendar": "^3.1.6",
     "svelte-router": "^3.0.0-alpha.2"
