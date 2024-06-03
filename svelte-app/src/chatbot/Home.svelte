@@ -1,4 +1,6 @@
- <script>
+<script>
+    import { Link } from "svelte-routing";
+
     let weathers = []; // 받은 데이터를 저장할 변수
     let tripLocation;
 
@@ -90,8 +92,12 @@
 </div>
 
 <div class="button-container">
-    <button class="next-button" on:click={inputValue}>Chatbot START</button>
-    </div>
+    {#if weathers.length > 0}
+        <Link to="chatbot">
+            <button class="next-button">Chatbot START</button>
+        </Link>
+    {/if}
+</div>
 </body>
 
 
