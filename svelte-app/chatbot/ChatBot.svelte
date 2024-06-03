@@ -45,7 +45,7 @@
             }
 	        const data = await response.json();
 			console.log(data);
-            return data.response;
+            return data.responses[0];
         } catch (error) {
             console.error('Error fetching AI response:', error);
             return 'Error fetching AI response';
