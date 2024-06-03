@@ -1,8 +1,6 @@
 <script>
     let messages = []; // 내 메세지를 담은 배열
 
-    // const backEndpoint = "http://localhost:8081/message";
-
     const inputChat = () => { // 내 메시지를 입력하는 함수
         const messageInput = document.getElementById("messageInput");
         const message = messageInput.value.trim();
