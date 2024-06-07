@@ -51,7 +51,10 @@
             case '구름많음': return 'more_cloudy.png';
             case '구름많고 한때 비': return 'cloudy_rainy.png';
             case '눈': return 'snowy.png';
-            case '흐리고 한때 비': return 'rainy.png';
+            case '흐림': return 'cloudy.jpeg'
+            case '흐리고 한때 비':
+            case '흐리고 비':
+				return 'rainy.png';
             default: return 'default.png';
         }
     }
